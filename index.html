@@ -48,18 +48,24 @@
         .selection-card {
             width: 35px;
             height: 55px;
-            background: linear-gradient(135deg, var(--ghibli-green), #3a5f47);
-            background-image: repeating-linear-gradient(45deg, rgba(255,255,255,0.1) 25%, transparent 25%, transparent 75%, rgba(255,255,255,0.1) 75%, rgba(255,255,255,0.1));
+            background: linear-gradient(135deg, #1e3a8a, #7e22ce, #be185d);
+            background-image: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.2) 1px, transparent 1px);
             background-size: 10px 10px;
-            border: 2px solid #fff;
+            border: 2px solid rgba(255,255,255,0.8);
             border-radius: 4px;
             cursor: pointer;
             transition: transform 0.2s, opacity 0.3s;
             box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 1.2rem;
         }
         .selection-card:hover {
             transform: translateY(-10px);
             box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            color: rgba(255, 255, 255, 0.8);
         }
         .selection-card.selected {
             opacity: 0;
@@ -67,7 +73,7 @@
             transform: translateY(-20px) scale(0.8);
         }
         @media (min-width: 768px) {
-            .selection-card { width: 45px; height: 75px; gap: 8px; }
+            .selection-card { width: 45px; height: 75px; gap: 8px; font-size: 1.5rem; }
         }
 
         /* Card 3D Flip Effects */
@@ -106,19 +112,24 @@
             overflow: hidden;
         }
         
-        /* Ghibli Cute Card Back */
+        /* Gemini Cute Card Back */
         .card__face--front {
-            background: linear-gradient(135deg, var(--ghibli-green), #3a5f47);
-            background-image: repeating-linear-gradient(45deg, rgba(255,255,255,0.1) 25%, transparent 25%, transparent 75%, rgba(255,255,255,0.1) 75%, rgba(255,255,255,0.1)), repeating-linear-gradient(45deg, rgba(255,255,255,0.1) 25%, transparent 25%, transparent 75%, rgba(255,255,255,0.1) 75%, rgba(255,255,255,0.1));
-            background-position: 0 0, 10px 10px;
-            background-size: 20px 20px;
+            background: linear-gradient(135deg, #1e3a8a, #7e22ce, #be185d);
+            background-image: 
+                radial-gradient(circle at 20% 30%, rgba(255,255,255,0.15) 2px, transparent 3px),
+                radial-gradient(circle at 80% 70%, rgba(255,255,255,0.15) 2px, transparent 3px),
+                linear-gradient(135deg, #1e3a8a, #7e22ce, #be185d);
+            background-size: 30px 30px, 40px 40px, 100% 100%;
+            border: 2px solid rgba(255,255,255,0.6);
         }
         .card-back-icon {
-            font-size: 2rem;
-            filter: drop-shadow(2px 2px 0px rgba(0,0,0,0.3));
+            font-size: 2.5rem;
+            filter: drop-shadow(0px 2px 5px rgba(0,0,0,0.4));
+            color: #fff;
+            text-shadow: 0 0 10px rgba(255,255,255,0.5);
         }
         @media (min-width: 768px) {
-            .card-back-icon { font-size: 3rem; }
+            .card-back-icon { font-size: 4rem; }
         }
 
         /* Card Front (Face up) */
@@ -228,11 +239,16 @@
 <body class="text-gray-800 flex flex-col items-center">
 
     <!-- Header -->
-    <header class="w-full text-center py-6 bg-white/40 backdrop-blur-md shadow-sm border-b border-green-200">
+    <header class="w-full text-center py-6 bg-white/40 backdrop-blur-md shadow-sm border-b border-green-200 relative">
         <h1 class="text-3xl md:text-4xl font-mali font-bold text-green-800 drop-shadow-sm flex items-center justify-center gap-2">
             🔮 ทาโร่พ่อหมอเจมิไน ✨
         </h1>
         <p class="text-sm mt-2 text-green-900 font-medium">ตั้งจิตอธิษฐาน สับไพ่ แล้วเลือกไพ่ด้วยตัวคุณเอง</p>
+        
+        <!-- Settings Button -->
+        <button onclick="openSettings()" class="absolute right-4 top-4 md:right-8 md:top-6 text-2xl hover:scale-110 transition-transform bg-white/50 rounded-full p-2 shadow-sm" title="ตั้งค่าระบบ AI">
+            ⚙️
+        </button>
     </header>
 
     <!-- Controls -->
@@ -312,55 +328,74 @@
         </div>
     </div>
 
+    <!-- Modal for Settings (API Key) -->
+    <div id="settingsModal" class="fixed inset-0 z-50 hidden flex justify-center items-center bg-black/60 p-4 transition-opacity">
+        <div class="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl relative">
+            <button onclick="closeSettings()" class="absolute top-3 right-3 text-gray-500 hover:text-red-500 font-bold text-xl">&times;</button>
+            <h3 class="text-2xl font-mali font-bold text-green-800 mb-2">⚙️ ตั้งค่าเวทมนตร์ (AI)</h3>
+            <p class="text-sm text-gray-600 mb-4 font-prompt">
+                เพื่อให้พ่อหมอเจมิไนช่วยสรุปคำทำนายให้ กรุณาใส่ <b>Gemini API Key</b> ของคุณ (รับฟรีได้ที่ Google AI Studio)<br><br>
+                <span class="text-xs text-red-600">* คีย์จะถูกเก็บไว้ในเครื่องของคุณเท่านั้น (Local Storage) ปลอดภัย 100% ไม่ถูกส่งไปที่อื่น</span>
+            </p>
+            <div class="mb-4">
+                <input type="password" id="apiKeyInput" placeholder="ใส่ Gemini API Key ที่นี่..." class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 font-mono text-sm">
+            </div>
+            <div class="flex gap-2">
+                <button onclick="saveSettings()" class="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg font-mali hover:bg-green-700 transition">บันทึก</button>
+                <button onclick="closeSettings()" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg font-mali hover:bg-gray-300 transition">ยกเลิก</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // --- 1. Tarot Deck Data Generation (78 Cards) ---
         const majorArcana = [
-            { id: 0, name: "The Fool", th: "ผู้หลงทาง / การเริ่มต้นใหม่", emoji: "🏕️", meaning: "การผจญภัยครั้งใหม่ อิสระ ความไร้เดียงสา การก้าวเดินโดยไม่กลัวอนาคต" },
-            { id: 1, name: "The Magician", th: "ผู้วิเศษ", emoji: "✨", meaning: "พลังสร้างสรรค์ ความสามารถ การมีทรัพยากรพร้อมที่จะลงมือทำ" },
-            { id: 2, name: "The High Priestess", th: "นักบวชหญิง", emoji: "🌙", meaning: "สัญชาตญาณ ความลับ ความสงบ การฟังเสียงในจิตใจตนเอง" },
-            { id: 3, name: "The Empress", th: "จักรพรรดินี", emoji: "🌸", meaning: "ความอุดมสมบูรณ์ ธรรมชาติ การดูแลเอาใจใส่ ความรักที่อบอุ่น" },
-            { id: 4, name: "The Emperor", th: "จักรพรรดิ", emoji: "⛰️", meaning: "ความมั่นคง กฎระเบียบ ความเป็นผู้นำ การปกป้องดูแล" },
-            { id: 5, name: "The Hierophant", th: "นักบวช", emoji: "📜", meaning: "ประเพณี ความเชื่อ การเรียนรู้ การขอคำปรึกษาจากผู้มีประสบการณ์" },
-            { id: 6, name: "The Lovers", th: "คู่รัก", emoji: "💞", meaning: "ความรัก ความกลมเกลียว การตัดสินใจเลือกทางที่หัวใจต้องการ" },
-            { id: 7, name: "The Chariot", th: "อัศวินรถม้า", emoji: "🐎", meaning: "ความมุ่งมั่น การเอาชนะอุปสรรค การเดินทาง ความตั้งใจที่แน่วแน่" },
-            { id: 8, name: "Strength", th: "ความเข้มแข็ง", emoji: "🦁", meaning: "ความกล้าหาญ ความเมตตา การควบคุมอารมณ์ด้วยความอ่อนโยน" },
-            { id: 9, name: "The Hermit", th: "ฤาษี", emoji: "🏮", meaning: "การค้นหาตัวเอง ความสันโดษ การทบทวนเรื่องราวเงียบๆ" },
-            { id: 10, name: "Wheel of Fortune", th: "กงล้อโชคชะตา", emoji: "🎡", meaning: "การเปลี่ยนแปลง จังหวะชีวิต โอกาสใหม่ๆ ที่หมุนเวียนเข้ามา" },
-            { id: 11, name: "Justice", th: "ความยุติธรรม", emoji: "⚖️", meaning: "ความสมดุล ความถูกต้อง การตัดสินใจด้วยเหตุผล" },
-            { id: 12, name: "The Hanged Man", th: "คนห้อยหัว", emoji: "🕸️", meaning: "การเสียสละ การมองมุมกลับ การหยุดนิ่งเพื่อรอเวลาที่เหมาะสม" },
-            { id: 13, name: "Death", th: "ความตาย", emoji: "🦋", meaning: "การสิ้นสุดเพื่อเริ่มต้นใหม่ การเปลี่ยนแปลงครั้งใหญ่ การปล่อยวางสิ่งเก่า" },
-            { id: 14, name: "Temperance", th: "การกลมกลืน", emoji: "🍵", meaning: "ความพอดี การปรับตัว การรักษาสมดุลในชีวิตและจิตใจ" },
-            { id: 15, name: "The Devil", th: "ปีศาจ", emoji: "🔥", meaning: "ความลุ่มหลง กิเลส การยึดติดกับวัตถุหรือพันธนาการที่มองไม่เห็น" },
-            { id: 16, name: "The Tower", th: "หอคอย", emoji: "⚡", meaning: "การพังทลาย เหตุการณ์ไม่คาดฝัน การทลายอีโก้เพื่อสร้างใหม่" },
-            { id: 17, name: "The Star", th: "ดวงดาว", emoji: "⭐", meaning: "ความหวัง แรงบันดาลใจ การเยียวยารักษา อนาคตที่สดใส" },
-            { id: 18, name: "The Moon", th: "พระจันทร์", emoji: "🐺", meaning: "ความกังวล ภาพลวงตา ความสับสนในจิตใจ การเผชิญกับความกลัว" },
-            { id: 19, name: "The Sun", th: "พระอาทิตย์", emoji: "☀️", meaning: "ความสำเร็จ ความสุข ความร่าเริง พลังงานบวกที่เต็มเปี่ยม" },
-            { id: 20, name: "Judgement", th: "การตัดสิน", emoji: "📯", meaning: "การตื่นรู้ การชำระล้าง ผลของการกระทำ การได้รับโอกาสครั้งที่สอง" },
-            { id: 21, name: "The World", th: "โลก", emoji: "🌍", meaning: "ความสมบูรณ์แบบ ความสำเร็จตามเป้าหมาย การจบรอบวัฏจักรอย่างสวยงาม" }
+            { id: 0, name: "The Fool", th: "ผู้หลงทาง / การเริ่มต้นใหม่", emoji: "🏕️", meaning: "การผจญภัยครั้งใหม่ อิสระ ความไร้เดียงสา การก้าวเดินโดยไม่กลัวอนาคต ทิ้งอดีตไว้เบื้องหลัง\nการงาน: เริ่มงานใหม่ ธุรกิจใหม่\nความรัก: รักอิสระ รักใหม่ที่คาดไม่ถึง\nคำแนะนำ: กล้าเสี่ยงและทำตามเสียงหัวใจ" },
+            { id: 1, name: "The Magician", th: "ผู้วิเศษ", emoji: "✨", meaning: "พลังสร้างสรรค์ ความสามารถ การมีทรัพยากรพร้อมที่จะลงมือทำ การสื่อสารที่เป็นเลิศ\nการงาน: โดดเด่น มีความสามารถรอบด้าน\nความรัก: มีเสน่ห์ดึงดูด คุยเก่ง\nคำแนะนำ: ดึงศักยภาพที่มีออกมาใช้ให้เต็มที่" },
+            { id: 2, name: "The High Priestess", th: "นักบวชหญิง", emoji: "🌙", meaning: "สัญชาตญาณ ความลับ ความสงบ การฟังเสียงในจิตใจตนเอง ลางสังหรณ์แม่นยำ\nการงาน: ใช้สติปัญญา ซ่อนความรู้สึก\nความรัก: รักซ้อน รักที่คาดเดายาก\nคำแนะนำ: เชื่อมั่นในสัญชาตญาณตนเอง" },
+            { id: 3, name: "The Empress", th: "จักรพรรดินี", emoji: "🌸", meaning: "ความอุดมสมบูรณ์ ธรรมชาติ การดูแลเอาใจใส่ ความรักที่อบอุ่น การก่อกำเนิดสิ่งใหม่\nการงาน: เจริญรุ่งเรือง ผู้ใหญ่เมตตา\nความรัก: อบอุ่น สมหวัง\nคำแนะนำ: มอบความรักและดูแลสิ่งรอบตัวให้ดี" },
+            { id: 4, name: "The Emperor", th: "จักรพรรดิ", emoji: "⛰️", meaning: "ความมั่นคง กฎระเบียบ ความเป็นผู้นำ การปกป้องดูแล อำนาจและโครงสร้าง\nการงาน: มั่นคง ได้รับการสนับสนุน\nความรัก: มั่นคงแต่อาจขาดความโรแมนติก\nคำแนะนำ: จัดระเบียบชีวิตและมีความรับผิดชอบ" },
+            { id: 5, name: "The Hierophant", th: "นักบวช", emoji: "📜", meaning: "ประเพณี ความเชื่อ การเรียนรู้ การขอคำปรึกษาจากผู้มีประสบการณ์ สิ่งศักดิ์สิทธิ์คุ้มครอง\nการงาน: งานราชการ งานสอน เดินตามกรอบ\nความรัก: รักที่ถูกต้องตามประเพณี\nคำแนะนำ: ทำในสิ่งที่ถูกต้องตามหลักศีลธรรม" },
+            { id: 6, name: "The Lovers", th: "คู่รัก", emoji: "💞", meaning: "ความรัก ความกลมเกลียว การตัดสินใจเลือกทางที่หัวใจต้องการ หุ้นส่วนที่ดี\nการงาน: เจอพาร์ทเนอร์ที่ดี งานที่ต้องเลือก\nความรัก: สมหวัง มีเสน่ห์\nคำแนะนำ: เลือกในสิ่งที่ใจคุณรักจริงๆ" },
+            { id: 7, name: "The Chariot", th: "อัศวินรถม้า", emoji: "🐎", meaning: "ความมุ่งมั่น การเอาชนะอุปสรรค การเดินทาง ความตั้งใจที่แน่วแน่ การควบคุมสถานการณ์\nการงาน: เหนื่อยแต่สำเร็จ ต้องบุกเบิก\nความรัก: อุปสรรคเยอะแต่สู้ไม่ถอย\nคำแนะนำ: ลุยหน้าต่อไป อย่ายอมแพ้กลางทาง" },
+            { id: 8, name: "Strength", th: "ความเข้มแข็ง", emoji: "🦁", meaning: "ความกล้าหาญ ความเมตตา การควบคุมอารมณ์ด้วยความอ่อนโยน พลังใจที่เข้มแข็ง\nการงาน: จัดการปัญหายากๆ ได้ด้วยความนุ่มนวล\nความรัก: เข้าอกเข้าใจ ยอมรับข้อเสียกันได้\nคำแนะนำ: ใช้ความอ่อนโยนสยบความแข็งกร้าว" },
+            { id: 9, name: "The Hermit", th: "ฤาษี", emoji: "🏮", meaning: "การค้นหาตัวเอง ความสันโดษ การทบทวนเรื่องราวเงียบๆ แสงสว่างนำทางชีวิต\nการงาน: ต้องการสมาธิ งานเบื้องหลัง\nความรัก: โสด โลกส่วนตัวสูง\nคำแนะนำ: ถอยออกมาพัก เพื่อทบทวนตัวเองเงียบๆ" },
+            { id: 10, name: "Wheel of Fortune", th: "กงล้อโชคชะตา", emoji: "🎡", meaning: "การเปลี่ยนแปลง จังหวะชีวิต โอกาสใหม่ๆ ที่หมุนเวียนเข้ามา โชคชะตา\nการงาน: โอกาสทอง การเปลี่ยนแปลงที่ดี\nความรัก: บุพเพสันนิวาส วงจรความรัก\nคำแนะนำ: ปล่อยให้ทุกอย่างเป็นไปตามจังหวะเวลา" },
+            { id: 11, name: "Justice", th: "ความยุติธรรม", emoji: "⚖️", meaning: "ความสมดุล ความถูกต้อง การตัดสินใจด้วยเหตุผล เอกสาร สัญญา กฎหมาย\nการงาน: ตกลงสัญญาได้ด้วยดี ได้รับความยุติธรรม\nความรัก: ใช้เหตุผลมากกว่าอารมณ์\nคำแนะนำ: ตัดสินใจอย่างตรงไปตรงมาและเป็นธรรม" },
+            { id: 12, name: "The Hanged Man", th: "คนห้อยหัว", emoji: "🕸️", meaning: "การเสียสละ การมองมุมกลับ การหยุดนิ่งเพื่อรอเวลาที่เหมาะสม ความอึดอัด\nการงาน: โปรเจกต์ชะงัก เสียสละ\nความรัก: รอคอย ติดบ่วงความรู้สึก\nคำแนะนำ: ปล่อยวาง เปลี่ยนมุมมองใหม่ให้สถานการณ์" },
+            { id: 13, name: "Death", th: "ความตาย", emoji: "🦋", meaning: "การสิ้นสุดเพื่อเริ่มต้นใหม่ การเปลี่ยนแปลงครั้งใหญ่ การปล่อยวางสิ่งเก่า\nการงาน: จบงานเก่า เริ่มโปรเจกต์ใหม่\nความรัก: เลิกรา หรือจบปัญหาเพื่อเริ่มใหม่\nคำแนะนำ: ยอมรับการเปลี่ยนแปลงเพื่อสิ่งที่ดีกว่า" },
+            { id: 14, name: "Temperance", th: "การกลมกลืน", emoji: "🍵", meaning: "การกลมกลืน การปรับตัว การรักษาสมดุลในชีวิตและจิตใจ การโยกย้าย\nการงาน: ปรับเปลี่ยนตำแหน่ง เปลี่ยนแปลงองค์กร\nความรัก: ค่อยๆ ปรับตัวเข้าหากัน\nคำแนะนำ: หาความพอดีและยืดหยุ่นกับสถานการณ์" },
+            { id: 15, name: "The Devil", th: "ปีศาจ", emoji: "🔥", meaning: "ความลุ่มหลง กิเลส การยึดติดกับวัตถุหรือพันธนาการที่มองไม่เห็น ธุรกิจสีเทา\nการงาน: ได้ผลประโยชน์แต่มีความเสี่ยง\nความรัก: รักซ้อน หึงหวง ร้อนแรงแต่เป็นพิษ\nคำแนะนำ: ตัดขาดจากสิ่งที่ทำให้สูญเสียความเป็นตัวเอง" },
+            { id: 16, name: "The Tower", th: "หอคอย", emoji: "⚡", meaning: "การพังทลาย เหตุการณ์ไม่คาดฝัน การทลายอีโก้เพื่อสร้างใหม่ เซอร์ไพรส์\nการงาน: พังทลายกะทันหัน มีปากเสียง\nความรัก: เลิกรากะทันหัน ทะเลาะรุนแรง\nคำแนะนำ: ควบคุมสติ สิ่งที่พังไปจะเปิดทางให้สิ่งใหม่" },
+            { id: 17, name: "The Star", th: "ดวงดาว", emoji: "⭐", meaning: "ความหวัง แรงบันดาลใจ การเยียวยารักษา อนาคตที่สดใส ชื่อเสียง\nการงาน: โดดเด่น เป็นที่รู้จัก งานราบรื่น\nความรัก: เยียวยาแผลใจ รักที่สดใส\nคำแนะนำ: มองโลกในแง่ดีและเชื่อมั่นในอนาคต" },
+            { id: 18, name: "The Moon", th: "พระจันทร์", emoji: "🐺", meaning: "ความกังวล ภาพลวงตา ความสับสนในจิตใจ การเผชิญกับความกลัว ความไม่ชัดเจน\nการงาน: คลุมเครือ ระวังถูกหลอกลวง\nความรัก: คิดมาก หวาดระแวง\nคำแนะนำ: อย่าเพิ่งตัดสินใจในตอนที่ภาพยังไม่ชัด" },
+            { id: 19, name: "The Sun", th: "พระอาทิตย์", emoji: "☀️", meaning: "ความสำเร็จ ความสุข ความร่าเริง พลังงานบวกที่เต็มเปี่ยม การเฉลิมฉลอง\nการงาน: ประสบความสำเร็จขั้นสุด\nความรัก: แฮปปี้ สมหวัง ชัดเจน\nคำแนะนำ: เปิดรับความสุขและมองโลกในแง่บวก" },
+            { id: 20, name: "Judgement", th: "การตัดสิน", emoji: "📯", meaning: "การตื่นรู้ การชำระล้าง ผลของการกระทำ การได้รับโอกาสครั้งที่สอง ข่าวสาร\nการงาน: ได้รับการประเมิน ผลลัพธ์จากสิ่งที่ทำมา\nความรัก: ปรับความเข้าใจ ได้เริ่มต้นกันใหม่\nคำแนะนำ: ตื่นรู้จากอดีตและทำวันนี้ให้ดีที่สุด" },
+            { id: 21, name: "The World", th: "โลก", emoji: "🌍", meaning: "ความสมบูรณ์แบบ ความสำเร็จตามเป้าหมาย การจบรอบวัฏจักรอย่างสวยงาม ต่างประเทศ\nการงาน: งานบรรลุเป้าหมาย โกอินเตอร์\nความรัก: รักที่สมบูรณ์แบบ ลงเอยด้วยดี\nคำแนะนำ: ยินดีกับความสำเร็จและเตรียมตัวก้าวต่อไป" }
         ];
 
         const suits = [
-            { type: "Wands", th: "ไม้เท้า", icon: "🪄", meaning: "การงาน แรงบันดาลใจ พลังงาน ความคิดสร้างสรรค์" },
-            { type: "Cups", th: "ถ้วย", icon: "🏆", meaning: "ความรัก อารมณ์ ความสัมพันธ์ ความรู้สึก" },
-            { type: "Swords", th: "ดาบ", icon: "⚔️", meaning: "ความคิด อุปสรรค ปัญญา การตัดสินใจ ความขัดแย้ง" },
-            { type: "Pentacles", th: "เหรียญ", icon: "🪙", meaning: "การเงิน วัตถุ ความมั่นคง รากฐาน อาชีพ" }
+            { type: "Wands", th: "ไม้เท้า", icon: "🪄", meaning: "โดดเด่นเรื่อง 'การงาน' แพชชั่น พลังงาน ความคิดสร้างสรรค์ และการลงมือทำ ฝ่าฟันอุปสรรคเพื่อเป้าหมาย" },
+            { type: "Cups", th: "ถ้วย", icon: "🏆", meaning: "โดดเด่นเรื่อง 'ความรัก' อารมณ์ ความรู้สึก ความสัมพันธ์ จิตวิญญาณ และมิตรภาพที่ลึกซึ้ง" },
+            { type: "Swords", th: "ดาบ", icon: "⚔️", meaning: "โดดเด่นเรื่อง 'ปัญหาและอุปสรรค' ความคิด ปัญญา การสื่อสาร การตัดสินใจเด็ดขาด และความขัดแย้ง" },
+            { type: "Pentacles", th: "เหรียญ", icon: "🪙", meaning: "โดดเด่นเรื่อง 'การเงิน' วัตถุ ความมั่นคง รากฐาน อาชีพ ผลประโยชน์ และสิ่งที่จับต้องได้" }
         ];
 
         const minorMeanings = {
-            1: { name: "Ace", th: "เริ่มต้น", meaning: "โอกาสใหม่ๆ จุดเริ่มต้นที่ดี พลังงานใหม่" },
-            2: { name: "Two", th: "สอง", meaning: "ความสมดุล การเลือก หุ้นส่วน การประนีประนอม" },
-            3: { name: "Three", th: "สาม", meaning: "การเติบโต การทำงานร่วมกัน ความสำเร็จเบื้องต้น" },
-            4: { name: "Four", th: "สี่", meaning: "ความมั่นคง การพักผ่อน การสร้างรากฐาน" },
-            5: { name: "Five", th: "ห้า", meaning: "ความขัดแย้ง การสูญเสีย ความท้าทาย บททดสอบ" },
-            6: { name: "Six", th: "หก", meaning: "ความสำเร็จ การแบ่งปัน ความช่วยเหลือ ความทรงจำ" },
-            7: { name: "Seven", th: "เจ็ด", meaning: "การประเมิน การรอคอย ความพยายาม การป้องกันตัว" },
-            8: { name: "Eight", th: "แปด", meaning: "ความรวดเร็ว การทุ่มเท ความมุ่งมั่น การเคลื่อนไหว" },
-            9: { name: "Nine", th: "เก้า", meaning: "ใกล้ถึงเป้าหมาย ความวิตกกังวล ความสมบูรณ์ที่ใกล้เข้ามา" },
-            10: { name: "Ten", th: "สิบ", meaning: "จุดสูงสุด ความสมบูรณ์ ภาระที่หนักอึ้ง การสิ้นสุดรอบ" },
-            11: { name: "Page", th: "เด็กทารก", meaning: "ข่าวสาร ความอยากรู้อยากเห็น การเรียนรู้สิ่งใหม่" },
-            12: { name: "Knight", th: "อัศวิน", meaning: "การกระทำ การขับเคลื่อน ความทะเยอทะยาน การเดินทาง" },
-            13: { name: "Queen", th: "ราชินี", meaning: "การดูแล ความเข้าใจ สัญชาตญาณ ความเมตตา" },
-            14: { name: "King", th: "ราชา", meaning: "ความเป็นผู้นำ การควบคุม อำนาจ ความเชี่ยวชาญ" }
+            1: { name: "Ace", th: "หนึ่ง", meaning: "การเริ่มต้นใหม่ โอกาสดีๆ ที่กำลังจะเข้ามา พลังงานแห่งความหวังและการริเริ่ม" },
+            2: { name: "Two", th: "สอง", meaning: "การจับคู่ ความสมดุล การเลือก หุ้นส่วน การประนีประนอมเจรจา" },
+            3: { name: "Three", th: "สาม", meaning: "การขยายตัว การเติบโต การทำงานเป็นทีม ความสำเร็จเบื้องต้นหลังจากการเริ่มต้น" },
+            4: { name: "Four", th: "สี่", meaning: "ความมั่นคง การพักผ่อนชั่วคราว การสร้างรากฐานที่แข็งแรง ความปลอดภัย" },
+            5: { name: "Five", th: "ห้า", meaning: "ความขัดแย้ง ความสูญเสีย ความท้าทาย บททดสอบจิตใจและการปรับตัว" },
+            6: { name: "Six", th: "หก", meaning: "ความสำเร็จหลังอุปสรรค การแบ่งปัน ความช่วยเหลือ การนึกถึงความทรงจำในอดีต" },
+            7: { name: "Seven", th: "เจ็ด", meaning: "การประเมินสถานการณ์ การรอคอยผลลัพธ์ ความพยายามที่ไม่ลดละ การป้องกันตัว" },
+            8: { name: "Eight", th: "แปด", meaning: "ความรวดเร็ว การทุ่มเทอย่างหนัก ความมุ่งมั่น การเคลื่อนไหวและการเปลี่ยนแปลง" },
+            9: { name: "Nine", th: "เก้า", meaning: "ใกล้ถึงเป้าหมาย ความอุดมสมบูรณ์(ในบางเรื่อง) ความวิตกกังวล ความอดทนสุดท้าย" },
+            10: { name: "Ten", th: "สิบ", meaning: "จุดสูงสุด ความสมบูรณ์แบบ ภาระที่หนักอึ้ง การสิ้นสุดวงจรเพื่อรอการเริ่มต้นใหม่" },
+            11: { name: "Page", th: "มหาดเล็ก", meaning: "ข่าวสารใหม่ๆ ความอยากรู้อยากเห็น การเรียนรู้สิ่งใหม่ พลังงานของวัยรุ่นหรือเด็ก" },
+            12: { name: "Knight", th: "อัศวิน", meaning: "การลงมือทำ การขับเคลื่อน ความทะเยอทะยาน การเดินทาง การมุ่งไปข้างหน้า" },
+            13: { name: "Queen", th: "ราชินี", meaning: "การดูแล ความเข้าใจ สัญชาตญาณ ความเมตตา พลังงานแบบผู้ใหญ่ที่นุ่มนวล" },
+            14: { name: "King", th: "ราชา", meaning: "ความเป็นผู้นำ การควบคุม อำนาจ ความเชี่ยวชาญ พลังงานของผู้ใหญ่ที่มีเหตุผล" }
         };
 
         let fullDeck = [...majorArcana];
@@ -373,9 +408,15 @@
                     name: `${minorMeanings[i].name} of ${suit.type}`,
                     th: `${minorMeanings[i].th}${suit.th}`,
                     emoji: suit.icon,
-                    meaning: `[พลังงานแห่ง${suit.th}] ${minorMeanings[i].meaning} ที่เกี่ยวข้องกับ ${suit.meaning}`
+                    meaning: `[พลังงานแห่ง${suit.th}]: ${suit.meaning}\n\n[สถานการณ์ไพ่ใบนี้]: ${minorMeanings[i].meaning}\n\nคำแนะนำ: เมื่อนำมารวมกัน ไพ่ใบนี้เน้นให้คุณโฟกัสหรือรับมือกับเรื่องราวเกี่ยวกับ${suit.th} ในแง่มุมของการ${minorMeanings[i].meaning.split(' ')[0]}ครับ`
                 });
             }
+        });
+
+        // กำหนดพิกัดสำหรับตัดภาพ (Sprite) จากแผ่น TarotOrig72.jpg (12 คอลัมน์ x 7 แถว = 84 ช่อง)
+        fullDeck.forEach((card, index) => {
+            card.spriteCol = index % 12;
+            card.spriteRow = Math.floor((index % 84) / 12);
         });
 
         // --- 2. Spreads Configurations ---
@@ -431,6 +472,26 @@
         let deckToSelectFrom = [];
         let selectedCardsData = [];
 
+        // Settings Logic
+        function openSettings() {
+            document.getElementById('apiKeyInput').value = localStorage.getItem('gemini_tarot_apikey') || '';
+            document.getElementById('settingsModal').classList.remove('hidden');
+        }
+
+        function closeSettings() {
+            document.getElementById('settingsModal').classList.add('hidden');
+        }
+
+        function saveSettings() {
+            const key = document.getElementById('apiKeyInput').value.trim();
+            if (key) {
+                localStorage.setItem('gemini_tarot_apikey', key);
+            } else {
+                localStorage.removeItem('gemini_tarot_apikey');
+            }
+            closeSettings();
+        }
+
         function shuffle(array) {
             let currentIndex = array.length, randomIndex;
             while (currentIndex != 0) {
@@ -481,6 +542,7 @@
             deckToSelectFrom.forEach((card, index) => {
                 const c = document.createElement('div');
                 c.className = 'selection-card';
+                c.innerHTML = '♊'; // Added Gemini icon to the selection card back
                 c.onclick = () => selectCard(index, c);
                 grid.appendChild(c);
             });
@@ -539,13 +601,10 @@
                     cardEl.style.transform = `translate(${x}px, ${y}px)`;
                 }
 
-                // AI Generated Image URL for the specific card (Classic style)
-                const imgUrl = `https://image.pollinations.ai/prompt/Classic%20Rider%20Waite%20Tarot%20card%20${encodeURIComponent(cardData.name)}%20illustration%20highly%20detailed?width=240&height=380&nologo=true`;
-
                 cardEl.innerHTML = `
                     <div class="card" onclick="flipCard(this, ${index})">
                         <div class="card__face card__face--front">
-                            <span class="card-back-icon">🔮</span>
+                            <span class="card-back-icon">♊</span>
                         </div>
                         <div class="card__face card__face--back relative p-0 overflow-hidden border-[3px] border-[var(--ghibli-wood)]">
                             <!-- Fallback UI while image loads or offline -->
@@ -554,12 +613,17 @@
                                 <div class="text-3xl md:text-5xl mb-1">${cardData.emoji}</div>
                                 <div class="text-[0.55rem] md:text-[0.7rem] font-bold text-[#8b5a2b] leading-tight">${cardData.th}</div>
                             </div>
-                            <!-- Dynamic Image -->
-                            <img src="${imgUrl}" 
-                                 class="absolute inset-0 w-full h-full object-cover z-10 opacity-0 transition-opacity duration-700" 
-                                 onload="this.style.opacity=1;" 
-                                 onerror="this.style.display='none'" 
-                                 alt="${cardData.name}" crossorigin="anonymous" />
+                            
+                            <!-- Dynamic Image (Sprite จากไฟล์รูปที่คุณอัปโหลด แก้ไขเป็น 7 แถว) -->
+                            <div class="absolute inset-0 z-10 overflow-hidden bg-[#fcf8e8]">
+                                <img src="TarotOrig72.jpg" 
+                                     class="absolute max-w-none transition-opacity duration-500 opacity-0" 
+                                     style="width: 1200%; height: 700%; transform: translate(calc(-100% / 12 * ${cardData.spriteCol}), calc(-100% / 7 * ${cardData.spriteRow}));"
+                                     onload="this.style.opacity=1;"
+                                     onerror="this.parentElement.style.display='none'"
+                                     alt="${cardData.name}" />
+                            </div>
+
                             <!-- Title Overlay -->
                             <div class="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/90 via-black/50 to-transparent pt-8 pb-2 px-1 z-20 text-center pointer-events-none">
                                 <div class="text-[0.6rem] md:text-[0.7rem] font-bold text-white drop-shadow-md leading-tight">${cardData.th}</div>
@@ -594,8 +658,8 @@
 
         function checkAllFlipped() {
             if (flippedCount === currentSpread.count) {
-                // รอให้ Animation พลิกไพ่ทำงานเสร็จก่อน
-                setTimeout(generateAISummary, 800);
+                // รอให้ Animation พลิกไพ่ทำงานเสร็จก่อน แล้วเรียกสรุป
+                setTimeout(generateSummary, 800);
             }
         }
 
@@ -607,7 +671,7 @@
             document.getElementById('modalEmoji').innerText = cardData.emoji;
             document.getElementById('modalTitle').innerText = cardData.th;
             document.getElementById('modalEng').innerText = cardData.name;
-            document.getElementById('modalMeaning').innerText = cardData.meaning;
+            document.getElementById('modalMeaning').innerHTML = cardData.meaning.replace(/\n/g, '<br>');
             
             const modal = document.getElementById('cardModal');
             modal.classList.remove('hidden');
@@ -617,7 +681,7 @@
             document.getElementById('cardModal').classList.add('hidden');
         }
 
-        // --- AI Summary Logic (Gemini API) ---
+        // --- Summary & AI Logic ---
         async function fetchWithRetry(url, payload, retries = 5) {
             const delays = [1000, 2000, 4000, 8000, 16000];
             for (let i = 0; i < retries; i++) {
@@ -636,18 +700,62 @@
             }
         }
 
-        async function generateAISummary() {
-            const apiKey = ""; // Execution environment provides the key
-            const contentDiv = document.getElementById('summary-content');
+        function renderBasicSummary() {
+            let html = '<h3 class="text-xl font-mali font-bold text-green-800 mb-4 border-b pb-2">📖 ความหมายไพ่เบื้องต้น</h3>';
+            html += '<ul class="space-y-4 mb-8">';
+            currentCards.forEach((c, i) => {
+                html += `
+                <li class="bg-white p-4 rounded-lg shadow-sm border border-green-100">
+                    <strong class="text-green-800 block mb-1">📍 ${currentSpread.positions[i]}</strong>
+                    <span class="font-bold text-gray-800">${c.th} ${c.emoji}</span>
+                    <div class="text-gray-600 text-sm mt-2 space-y-1">${c.meaning.replace(/\n/g, '<br>')}</div>
+                </li>`;
+            });
+            html += '</ul>';
+            return html;
+        }
+
+        async function generateSummary() {
             const summaryContainer = document.getElementById('summary-container');
+            const contentDiv = document.getElementById('summary-content');
             
             summaryContainer.classList.remove('hidden');
-            contentDiv.innerHTML = '<div class="text-center py-8"><div class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-green-200 border-t-green-700 mb-4"></div><p class="text-green-800 font-mali font-bold text-lg animate-pulse">พ่อหมอเจมิไนกำลังเพ่งสมาธิและอ่านคำทำนายให้คุณ...</p></div>';
             
-            // Scroll down to the summary section
             setTimeout(() => {
                 summaryContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }, 100);
+
+            // 1. สร้างส่วนสรุปพื้นฐานเสมอ (ไม่ใช้ AI ก็อ่านได้)
+            let html = renderBasicSummary();
+            
+            // 2. สร้างกรอบสำหรับ AI ด้านล่าง
+            html += '<div id="ai-summary-section" class="bg-gradient-to-br from-indigo-50 to-purple-50 p-6 rounded-2xl border border-indigo-100 shadow-inner">';
+            html += '<h3 class="text-xl font-mali font-bold text-indigo-900 mb-4 flex items-center gap-2"><span>🔮</span> คำทำนายภาพรวมจากพ่อหมอเจมิไน (AI)</h3>';
+            html += '<div id="ai-content"></div>';
+            html += '</div>';
+
+            contentDiv.innerHTML = html;
+
+            const aiContent = document.getElementById('ai-content');
+            
+            // ดึง Key จาก localStorage ของผู้ใช้โดยตรง
+            const apiKey = localStorage.getItem('gemini_tarot_apikey');
+
+            if (!apiKey) {
+                aiContent.innerHTML = `
+                <div class="bg-white/80 p-4 rounded-xl border border-indigo-200 text-sm text-indigo-800">
+                    <p class="flex items-start gap-2">
+                        <span class="text-lg">💡</span> 
+                        <span>
+                            <b>เคล็ดลับ:</b> หากต้องการให้ AI ช่วยร้อยเรียงและสรุปคำทำนายทั้งหมดให้<br>
+                            กรุณาคลิกปุ่มตั้งค่า (⚙️ มุมขวาบน) เพื่อระบุ API Key ของคุณครับ
+                        </span>
+                    </p>
+                </div>`;
+                return;
+            }
+
+            aiContent.innerHTML = '<div class="text-center py-6"><div class="inline-block animate-spin rounded-full h-10 w-10 border-4 border-indigo-200 border-t-indigo-600 mb-3"></div><p class="text-indigo-800 font-mali font-bold animate-pulse">พ่อหมอเจมิไนกำลังเพ่งสมาธิร้อยเรียงคำทำนาย...</p></div>';
 
             const spreadName = currentSpread.name || "การเปิดไพ่";
             const promptText = `คุณคือ "พ่อหมอเจมิไน" หมอดูไพ่ทาโรต์ผู้เชี่ยวชาญและใจดี จงทำนายดวงชะตาแบบ "${spreadName}" ให้กับผู้ใช้ โดยมีไพ่ที่เปิดได้ดังนี้:\n` +
@@ -662,26 +770,41 @@
                 };
 
                 const result = await fetchWithRetry(url, payload);
+                
+                if (result.error) {
+                    throw new Error(result.error.message || "API Error");
+                }
+
                 let text = result.candidates?.[0]?.content?.parts?.[0]?.text;
                 
                 if (text) {
-                    // Convert basic markdown to HTML
-                    text = text.replace(/\*\*(.*?)\*\*/g, '<strong class="text-green-900">$1</strong>');
+                    text = text.replace(/\*\*(.*?)\*\*/g, '<strong class="text-indigo-900">$1</strong>');
                     text = text.replace(/\n\n/g, '</p><p class="mb-4">');
                     text = text.replace(/\n/g, '<br>');
-                    contentDiv.innerHTML = `<p class="mb-4">${text}</p>`;
+                    aiContent.innerHTML = `<p class="mb-4 text-gray-700 leading-relaxed">${text}</p>`;
                 } else {
                     throw new Error("Invalid response format");
                 }
             } catch (error) {
                 console.error("AI Summary Error:", error);
-                // Fallback Summary in case API fails (Offline mode)
-                let fallbackHtml = '<div class="bg-yellow-50 p-4 rounded-xl mb-4 border border-yellow-200"><p class="text-sm text-yellow-700 italic flex items-center gap-2"><span>⚠️</span> ขณะนี้คุณอยู่ในโหมดออฟไลน์ หรือเวทมนตร์ AI ขัดข้อง นี่คือความหมายเบื้องต้นของไพ่แต่ละใบค่ะ</p></div><ul class="space-y-4">';
-                currentCards.forEach((c, i) => {
-                    fallbackHtml += `<li class="bg-white p-4 rounded-lg shadow-sm border border-green-100"><strong class="text-green-800 block mb-1">📍 ${currentSpread.positions[i]}</strong><span class="font-bold text-gray-800">${c.th} ${c.emoji}</span><br><span class="text-gray-600 text-sm">${c.meaning}</span></li>`;
-                });
-                fallbackHtml += '</ul>';
-                contentDiv.innerHTML = fallbackHtml;
+                
+                if (error.message.includes("API_KEY_INVALID") || error.message.includes("400")) {
+                     aiContent.innerHTML = `
+                        <div class="bg-red-50 p-4 rounded-xl border border-red-200">
+                            <p class="text-sm text-red-700 flex items-start gap-2">
+                                <span class="text-lg">❌</span> 
+                                <span><b>Gemini API Key ไม่ถูกต้อง</b> กรุณาตรวจสอบ Key ในเมนูตั้งค่าอีกครั้งครับ</span>
+                            </p>
+                        </div>`;
+                } else {
+                     aiContent.innerHTML = `
+                        <div class="bg-yellow-50 p-4 rounded-xl border border-yellow-200">
+                            <p class="text-sm text-yellow-700 flex items-start gap-2">
+                                <span class="text-lg">⚠️</span> 
+                                <span><b>เกิดข้อผิดพลาดในการเชื่อมต่อกับ AI</b> โปรดลองใหม่อีกครั้งภายหลัง</span>
+                            </p>
+                        </div>`;
+                }
             }
         }
 
