@@ -413,47 +413,51 @@
             }
         });
 
-        // Mapping ตำแหน่งของรูปภาพจากไฟล์ TarotOrig72.jpg (12 columns x 7 rows)
-        // เพื่อแก้ปัญหาภาพเรียงสุ่มไม่ตามลำดับ
-        const spriteMap = {
-            "The Fool": {r: 4, c: 8}, "The Magician": {r: 5, c: 10}, "The High Priestess": {r: 5, c: 1}, "The Empress": {r: 0, c: 1},
-            "The Emperor": {r: 4, c: 4}, "The Hierophant": {r: 3, c: 2}, "The Lovers": {r: 0, c: 5}, "The Chariot": {r: 6, c: 2},
-            "Strength": {r: 4, c: 6}, "The Hermit": {r: 6, c: 5}, "Wheel of Fortune": {r: 4, c: 10}, "Justice": {r: 2, c: 4},
-            "The Hanged Man": {r: 3, c: 11}, "Death": {r: 5, c: 6}, "Temperance": {r: 2, c: 6}, "The Devil": {r: 3, c: 0},
-            "The Tower": {r: 2, c: 0}, "The Star": {r: 1, c: 5}, "The Moon": {r: 1, c: 4}, "The Sun": {r: 5, c: 2},
-            "Judgement": {r: 4, c: 2}, "The World": {r: 3, c: 7},
-
-            "Ace of Wands": {r: 3, c: 10}, "Two of Wands": {r: 1, c: 3}, "Three of Wands": {r: 1, c: 1}, "Four of Wands": {r: 4, c: 11},
-            "Five of Wands": {r: 5, c: 7}, "Six of Wands": {r: 1, c: 8}, "Seven of Wands": {r: 3, c: 8}, "Eight of Wands": {r: 0, c: 4},
-            "Nine of Wands": {r: 4, c: 1}, "Ten of Wands": {r: 6, c: 4}, "Page of Wands": {r: 2, c: 10}, "Knight of Wands": {r: 3, c: 5},
-            "Queen of Wands": {r: 1, c: 11}, "King of Wands": {r: 5, c: 3},
-
-            "Ace of Cups": {r: 3, c: 4}, "Two of Cups": {r: 0, c: 2}, "Three of Cups": {r: 2, c: 9}, "Four of Cups": {r: 1, c: 2},
-            "Five of Cups": {r: 1, c: 7}, "Six of Cups": {r: 4, c: 3}, "Seven of Cups": {r: 3, c: 1}, "Eight of Cups": {r: 4, c: 5},
-            "Nine of Cups": {r: 5, c: 0}, "Ten of Cups": {r: 2, c: 8}, "Page of Cups": {r: 4, c: 9}, "Knight of Cups": {r: 0, c: 10},
-            "Queen of Cups": {r: 5, c: 4}, "King of Cups": {r: 0, c: 11},
-
-            "Ace of Swords": {r: 0, c: 7}, "Two of Swords": {r: 5, c: 11}, "Three of Swords": {r: 1, c: 0}, "Four of Swords": {r: 3, c: 9},
-            "Five of Swords": {r: 4, c: 0}, "Six of Swords": {r: 3, c: 6}, "Seven of Swords": {r: 5, c: 8}, "Eight of Swords": {r: 2, c: 2},
-            "Nine of Swords": {r: 5, c: 5}, "Ten of Swords": {r: 1, c: 9}, "Page of Swords": {r: 1, c: 6}, "Knight of Swords": {r: 2, c: 11},
-            "Queen of Swords": {r: 2, c: 1}, "King of Swords": {r: 6, c: 0},
-
-            "Ace of Pentacles": {r: 2, c: 7}, "Two of Pentacles": {r: 6, c: 1}, "Three of Pentacles": {r: 3, c: 3}, "Four of Pentacles": {r: 6, c: 3},
-            "Five of Pentacles": {r: 0, c: 9}, "Six of Pentacles": {r: 4, c: 7}, "Seven of Pentacles": {r: 0, c: 8}, "Eight of Pentacles": {r: 5, c: 9},
-            "Nine of Pentacles": {r: 1, c: 10}, "Ten of Pentacles": {r: 0, c: 6}, "Page of Pentacles": {r: 0, c: 0}, "Knight of Pentacles": {r: 2, c: 5},
-            "Queen of Pentacles": {r: 0, c: 3}, "King of Pentacles": {r: 2, c: 3}
-        };
-
-        // ล็อคพิกัดให้ไพ่แต่ละใบตาม Mapping ที่ทำไว้ด้านบน
+        // Mapping รูปภาพและตำแหน่งให้ตรงกับ 6 รูปที่อัปโหลดมาใหม่แบบเป๊ะๆ
         fullDeck.forEach((card) => {
-            const pos = spriteMap[card.name];
-            if (pos) {
-                card.spriteCol = pos.c;
-                card.spriteRow = pos.r;
+            let img = "";
+            let widthPercent = 100, heightPercent = 100;
+            let leftPercent = 0, topPercent = 0;
+
+            if (typeof card.id === 'number') {
+                if (card.id >= 0 && card.id <= 9) { 
+                    // Major Arcana 1-10 (ตามรูป major arcana 1.jpg คือ The Fool ถึง The Hermit)
+                    img = "major arcana 1.jpg";
+                    widthPercent = 550; heightPercent = 300; 
+                    let c = card.id % 5;
+                    let r = Math.floor(card.id / 5);
+                    leftPercent = -6 - (c * 107); 
+                    topPercent = -65 - (r * 135); 
+                } else if (card.id >= 10 && card.id <= 21) { 
+                    // Major Arcana 11-22 (ตามรูป major arcana 2.jpg คือ Wheel of Fortune ถึง The World)
+                    img = "major arcana 2.jpg";
+                    widthPercent = 660; heightPercent = 300;
+                    let c = (card.id - 10) % 6;
+                    let r = Math.floor((card.id - 10) / 6);
+                    leftPercent = -6 - (c * 107); 
+                    topPercent = -65 - (r * 135);
+                }
             } else {
-                card.spriteCol = 0; // Fallback ป้องกัน Error
-                card.spriteRow = 0;
+                let parts = card.id.split('-');
+                let suit = parts[0];
+                let num = parseInt(parts[1]); // 1 to 14
+                
+                // ตรวจสอบ Suit และเลือกรูปที่ตรงกัน
+                if (suit === 'Wands') img = "wand.jpg";
+                else if (suit === 'Cups') img = "cup.jpg";
+                else if (suit === 'Swords') img = "sword.jpg";
+                else if (suit === 'Pentacles') img = "pentacles.jpg";
+
+                widthPercent = 770; heightPercent = 310;
+                let c = (num - 1) % 7;
+                let r = Math.floor((num - 1) / 7);
+                
+                leftPercent = -6 - (c * 108);
+                topPercent = -65 - (r * 135);
             }
+            
+            card.bgImg = img;
+            card.imgStyle = `width: ${widthPercent}%; height: ${heightPercent}%; left: ${leftPercent}%; top: ${topPercent}%; position: absolute; max-width: none;`;
         });
 
         // --- 2. Spreads Configurations ---
@@ -651,11 +655,11 @@
                                 <div class="text-[0.55rem] md:text-[0.7rem] font-bold text-[#8b5a2b] leading-tight">${cardData.th}</div>
                             </div>
                             
-                            <!-- Dynamic Image (Sprite จากไฟล์รูปที่คุณอัปโหลด แก้ไขเป็น 7 แถว) -->
-                            <div class="absolute inset-0 z-10 overflow-hidden bg-[#fcf8e8]">
-                                <img src="TarotOrig72.jpg" 
-                                     class="absolute max-w-none transition-opacity duration-500 opacity-0" 
-                                     style="width: 1200%; height: 700%; transform: translate(calc(-100% / 12 * ${cardData.spriteCol}), calc(-100% / 7 * ${cardData.spriteRow}));"
+                            <!-- Dynamic Image (ใช้ 6 รูปที่อัปโหลดมาใหม่) -->
+                            <div class="absolute inset-0 z-10 overflow-hidden bg-[#fcf8e8] rounded-lg">
+                                <img src="${cardData.bgImg}" 
+                                     class="absolute transition-opacity duration-500 opacity-0" 
+                                     style="${cardData.imgStyle}"
                                      onload="this.style.opacity=1;"
                                      onerror="this.parentElement.style.display='none'"
                                      alt="${cardData.name}" />
