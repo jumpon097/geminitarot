@@ -816,7 +816,7 @@
                 `\n\nช่วยสรุปคำทำนายภาพรวมทั้งหมดเป็นภาษาไทยด้วยน้ำเสียงน่าเชื่อถือ อบอุ่น ให้กำลังใจ และให้คำแนะนำในการก้าวต่อไป (จัดย่อหน้าให้สวยงาม อ่านง่าย ใช้ emoji สากลประกอบบ้าง ความยาวพอประมาณ 3-4 ย่อหน้า)`;
 
             try {
-                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
                 const payload = {
                     contents: [{ parts: [{ text: promptText }] }],
                     systemInstruction: { parts: [{ text: "You are 'พ่อหมอเจมิไน', a wise, warm, and comforting Tarot reader. Respond only in Thai." }] }
